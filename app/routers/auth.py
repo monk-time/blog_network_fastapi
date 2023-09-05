@@ -20,7 +20,7 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-@router.post('/api/v1/jwt/create/', response_model=schemas.Token)
+@router.post('/jwt/create/', response_model=schemas.Token)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),

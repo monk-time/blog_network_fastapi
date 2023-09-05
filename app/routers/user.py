@@ -13,22 +13,21 @@ router = APIRouter(
 
 
 @router.get('/me', response_model=schemas.User)
-async def read_users_me(
+async def read_me(
     current_user: Annotated[schemas.UserInDB, Depends(get_current_active_user)]
 ):
     return current_user
 
 
-@router.get('/me/items/')
-async def read_own_items(
-    current_user: Annotated[schemas.UserInDB, Depends(get_current_active_user)]
-):
-    return [{'item_id': 'Foo', 'owner': current_user.username}]
-
-
 @router.post(
     '/',
     response_model=schemas.User,
+    responses={
+        400: {
+            'description': 'Username or email is already used',
+            'model': schemas.ErrorMessage
+        },
+    },
     status_code=status.HTTP_201_CREATED,
 )
 async def create_user(

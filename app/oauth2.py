@@ -12,7 +12,7 @@ from .schemas import TokenData, UserInDB
 
 SECRET_KEY = settings.secret
 ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='api/v1/jwt/create')
 
