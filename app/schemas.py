@@ -6,12 +6,17 @@ class ErrorMessage(BaseModel):
 
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    access: str
+    refresh: str
 
 
 class TokenData(BaseModel):
     username: str
+
+
+class TokenCreate(BaseModel):
+    username: str
+    password: str
 
 
 class UserBase(BaseModel):
