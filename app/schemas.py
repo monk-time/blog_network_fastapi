@@ -10,11 +10,18 @@ class TokenData(BaseModel):
     username: str
 
 
-class User(BaseModel):
+class UserBase(BaseModel):
     username: str
-    email: EmailStr | None = None
-    disabled: bool | None = None
+    email: EmailStr
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class User(UserBase):
+    is_active: bool
 
 
 class UserInDB(User):
-    hashed_password: str
+    password: str
