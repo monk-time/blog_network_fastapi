@@ -5,9 +5,20 @@ class ErrorMessage(BaseModel):
     detail: str
 
 
-class Token(BaseModel):
-    access: str
+class RefreshToken(BaseModel):
     refresh: str
+
+
+class AccessToken(BaseModel):
+    access: str
+
+
+class Tokens(AccessToken, RefreshToken):
+    pass
+
+
+class Token(BaseModel):
+    token: str
 
 
 class TokenData(BaseModel):
