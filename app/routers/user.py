@@ -25,7 +25,7 @@ async def read_me(
     responses={
         400: {
             'description': 'Username or email is already used',
-            'model': schemas.ErrorMessage
+            'model': schemas.ErrorMessage,
         },
     },
     status_code=status.HTTP_201_CREATED,
