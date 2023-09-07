@@ -115,10 +115,12 @@ class Follow(Base):
     )
 
     user: Mapped['User'] = relationship(
-        foreign_keys=[user_id], back_populates='follower'
+        foreign_keys=[user_id],
+        back_populates='follower',
     )
     following: Mapped['User'] = relationship(
-        foreign_keys=[following_id], back_populates='following'
+        foreign_keys=[following_id],
+        back_populates='following',
     )
 
     def __repr__(self) -> str:

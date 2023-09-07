@@ -3,13 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app import database, schemas
+from app import crud, database, schemas
 from app.oauth2 import get_current_active_user
 
-router = APIRouter(
-    tags=['User'],
-    prefix='/users',
-)
+router = APIRouter(tags=['User'], prefix='/users')
 
 
 @router.get('/me', response_model=schemas.User)
@@ -35,8 +32,8 @@ async def create_user(
     db: Session = Depends(database.get_db),
 ):
     try:
-        return database.create_user(db, user=user)
-    except database.UserExists:
+        return crud.create_user(db, user=user)
+    except crud.UserExists:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Username or email is already used',

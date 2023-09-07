@@ -45,3 +45,10 @@ class User(UserBase):
 
 class UserInDB(User):
     password: str
+
+
+class Group(BaseModel):
+    id: int
+    title: str
+    slug: str
+    description: str
