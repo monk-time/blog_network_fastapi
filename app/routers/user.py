@@ -1,10 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app import crud, database, schemas
+from app import crud, schemas
+from app.database import get_db
 from app.oauth2 import get_current_active_user
+from app.utils import validation_error
 
 router = APIRouter(tags=['User'], prefix='/users')
 
@@ -29,12 +31,9 @@ async def read_me(
 )
 async def create_user(
     user: schemas.UserCreate,
-    db: Session = Depends(database.get_db),
+    db: Session = Depends(get_db),
 ):
     try:
         return crud.create_user(db, user=user)
     except crud.UserExists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Username or email is already used',
-        )
+        raise validation_error('Username or email is already used')

@@ -12,5 +12,11 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def raise_not_found(message: str) -> None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
+def not_found_error(message):
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
+
+
+def validation_error(message):
+    return HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, detail=message
+    )

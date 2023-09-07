@@ -44,6 +44,7 @@ class User(UserBase):
 
 
 class UserInDB(User):
+    id: int
     password: str
 
 
@@ -52,3 +53,12 @@ class Group(BaseModel):
     title: str
     slug: str
     description: str
+
+
+class FollowCreate(BaseModel):
+    following: str
+
+
+class Follow(BaseModel):
+    user: str
+    following: str

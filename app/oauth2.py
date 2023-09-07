@@ -6,10 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app import crud
+from app import crud, schemas
 from app.config import settings
 from app.database import get_db
-from app.schemas import TokenData, UserInDB
 
 SECRET_KEY = settings.secret
 ALGORITHM = 'HS256'
@@ -49,13 +48,13 @@ CREDENTIALS_EXCEPTION = HTTPException(
 
 def verify_jwt_token(
     token: str, credentials_exception=CREDENTIALS_EXCEPTION
-) -> TokenData:
+) -> schemas.TokenData:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')  # type: ignore
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = schemas.TokenData(username=username)
     except JWTError:
         raise credentials_exception
     return token_data
@@ -73,7 +72,7 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: Annotated[UserInDB, Depends(get_current_user)]
+    current_user: Annotated[schemas.UserInDB, Depends(get_current_user)]
 ):
     if not current_user.is_active:
         raise HTTPException(
