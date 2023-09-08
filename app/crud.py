@@ -71,6 +71,11 @@ def create_post(
     return db_post
 
 
+def delete_post(db: Session, *, post: Post) -> None:
+    db.delete(post)
+    db.commit()
+
+
 def get_follows(db: Session, *, user_id: int) -> Sequence[Follow]:
     return db.scalars(select(Follow).where(Follow.user_id == user_id)).all()
 
