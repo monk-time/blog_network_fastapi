@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import schemas
-from app.models import Follow, Group, User
+from app.models import Follow, Group, Post, User
 from app.utils import get_password_hash
 
 
@@ -43,6 +43,32 @@ def get_groups(db: Session) -> Sequence[Group]:
 
 def get_group(db: Session, *, group_id: int) -> Group | None:
     return db.scalar(select(Group).where(Group.id == group_id))
+
+
+def get_posts(db: Session) -> Sequence[Post]:
+    return db.scalars(select(Post)).all()
+
+
+def get_post(db: Session, *, post_id: int) -> Post | None:
+    return db.scalar(select(Post).where(Post.id == post_id))
+
+
+def create_post(
+    db: Session,
+    *,
+    text: str,
+    image: str | None,
+    author_id: int,
+    group_id: int | None
+) -> Post:
+    db_post = Post(
+        text=text, image=image, author_id=author_id, group_id=group_id
+    )
+
+    db.add(db_post)
+    db.commit()
+    db.refresh(db_post)
+    return db_post
 
 
 def get_follows(db: Session, *, user_id: int) -> Sequence[Follow]:

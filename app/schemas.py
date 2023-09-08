@@ -1,4 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from datetime import datetime
+
+from pydantic import AliasPath, BaseModel, EmailStr, Field
 
 
 class ErrorMessage(BaseModel):
@@ -53,6 +55,23 @@ class Group(BaseModel):
     title: str
     slug: str
     description: str
+
+
+class PostCreate(BaseModel):
+    text: str
+    image: str | None
+    group: int | None
+
+
+class Post(BaseModel):
+    id: int
+    author: str = Field(validation_alias=AliasPath('author', 'username'))
+    text: str
+    pub_date: datetime
+    image: str | None
+    group: int | None = Field(
+        default=None, validation_alias=AliasPath('group', 'id')
+    )
 
 
 class FollowCreate(BaseModel):
