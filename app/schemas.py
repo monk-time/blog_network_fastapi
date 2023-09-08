@@ -60,5 +60,5 @@ class FollowCreate(BaseModel):
 
 
 class Follow(BaseModel):
-    user: str
-    following: str
+    user: str = Field(validation_alias=AliasPath('user', 'username'))
+    following: str = Field(validation_alias=AliasPath('following', 'username'))

@@ -28,14 +28,7 @@ async def read_follows(
     ],
     db: Session = Depends(get_db),
 ):
-    follows = crud.get_follows(db, user_id=current_user.id)
-    return [
-        {
-            'user': follow.user.username,
-            'following': follow.following.username,
-        }
-        for follow in follows
-    ]
+    return crud.get_follows(db, user_id=current_user.id)
 
 
 @router.post('/', response_model=schemas.Follow)
@@ -52,12 +45,9 @@ async def create_follow(
     if current_user == following_user:
         raise CANT_FOLLOW_SELF_ERROR
     try:
-        crud.create_follow(
+        follow = crud.create_follow(
             db, user_id=current_user.id, following_id=following_user.id
         )
     except crud.FollowExists:
         raise FOLLOW_EXISTS_ERROR
-    return {
-        'user': current_user.username,
-        'following': following_user.username,
-    }
+    return follow
