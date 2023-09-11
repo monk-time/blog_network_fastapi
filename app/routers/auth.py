@@ -47,6 +47,3 @@ async def refresh_access_token(token: schemas.RefreshToken):
 async def verify_jwt_token(token: schemas.Token):
     oauth2.verify_jwt_token(token.token)
     return Response(status_code=status.HTTP_200_OK)
-
-
-# TODO: correct documentation response for 401 (like in user.py)

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from app import models
 from app.database import engine
-from app.routers import auth, follow, group, post, user
+from app.routers import auth, comment, follow, group, post, user
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -10,8 +10,10 @@ app = FastAPI()
 
 API_PREFIX = '/api/v1'
 
-app.include_router(auth.router, prefix=API_PREFIX)
-app.include_router(user.router, prefix=API_PREFIX)
-app.include_router(group.router, prefix=API_PREFIX)
-app.include_router(post.router, prefix=API_PREFIX)
-app.include_router(follow.router, prefix=API_PREFIX)
+for router in (auth, comment, follow, group, post, user):
+    app.include_router(router.router, prefix=API_PREFIX)
+
+
+# TODO: correct documentation response for 401 (like in user.py) and 422/400
+# TODO: pagination for users
+# TODO: images

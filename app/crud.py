@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import schemas
-from app.models import Follow, Group, Post, User
+from app.models import Comment, Follow, Group, Post, User
 from app.utils import get_password_hash
 
 
@@ -94,6 +94,51 @@ def update_post(
 
 def delete_post(db: Session, *, post: Post) -> None:
     db.delete(post)
+    db.commit()
+
+
+def get_comments(post: Post) -> Sequence[Comment]:
+    return post.comments
+
+
+def get_comment(db: Session, *, comment_id: int, post: Post) -> Comment | None:
+    return db.scalar(
+        select(Comment).where(
+            Comment.id == comment_id, Comment.post_id == post.id
+        )
+    )
+
+
+def create_comment(
+    db: Session, *, data: schemas.CommentCreate, post: Post, author_id: int
+) -> Comment:
+    db_comment = Comment(
+        **data.model_dump(),
+        post_id=post.id,
+        author_id=author_id,
+    )
+
+    db.add(db_comment)
+    db.commit()
+    db.refresh(db_comment)
+    return db_comment
+
+
+def update_comment(
+    db: Session, *, comment: Comment, data: schemas.CommentUpdate
+) -> Comment | None:
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(comment, field, value)
+
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+    return comment
+
+
+def delete_comment(db: Session, *, comment: Comment) -> None:
+    db.delete(comment)
     db.commit()
 
 

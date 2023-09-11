@@ -84,6 +84,22 @@ class Post(BaseModel):
     )
 
 
+class CommentCreate(BaseModel):
+    text: str
+
+
+class CommentUpdate(CommentCreate):
+    pass
+
+
+class Comment(BaseModel):
+    id: int
+    author: str = Field(validation_alias=AliasPath('author', 'username'))
+    text: str
+    created: datetime
+    post: int = Field(validation_alias=AliasPath('post', 'id'))
+
+
 class FollowCreate(BaseModel):
     following: str
 
