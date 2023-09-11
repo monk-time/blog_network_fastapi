@@ -38,19 +38,27 @@ async def create_post(
     ],
     db: Session = Depends(get_db),
 ):
-    if data.group:
-        group = crud.get_group(db, group_id=data.group)
-        if not group:
-            raise not_found_error('Страница не найдена.')
-    else:
-        group = None
-    return crud.create_post(
-        db,
-        text=data.text,
-        image=data.image,
-        author_id=current_user.id,
-        group_id=group.id if group else None,
-    )
+    try:
+        return crud.create_post(db, data=data, author_id=current_user.id)
+    except crud.GroupDoesNotExist:
+        raise not_found_error('Страница не найдена.')
+
+
+@router.patch('/{post_id}', response_model=schemas.Post)
+async def update_post(
+    data: schemas.PostUpdate,
+    post: Annotated[models.Post, Depends(get_post)],
+    current_user: Annotated[
+        schemas.UserInDB, Depends(get_current_active_user)
+    ],
+    db: Session = Depends(get_db),
+):
+    if current_user != post.author:
+        raise not_author_error('Изменение чужого контента запрещено.')
+    try:
+        return crud.update_post(db, post=post, data=data)
+    except crud.GroupDoesNotExist:
+        raise not_found_error('Страница не найдена.')
 
 
 @router.delete('/{post_id}', status_code=status.HTTP_204_NO_CONTENT)

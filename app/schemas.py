@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import AliasPath, BaseModel, EmailStr, Field
+from pydantic import AliasPath, BaseModel, EmailStr, Field, validator
 
 
 class ErrorMessage(BaseModel):
@@ -59,8 +59,18 @@ class Group(BaseModel):
 
 class PostCreate(BaseModel):
     text: str
-    image: str | None
-    group: int | None
+    image: str | None = None
+    group: int | None = None
+
+
+class PostUpdate(PostCreate):
+    text: str | None = None
+
+    @validator('text')
+    def text_cannot_be_null(cls, value):
+        if value is None:
+            raise ValueError('Поле text не может быть пустым.')
+        return value
 
 
 class Post(BaseModel):

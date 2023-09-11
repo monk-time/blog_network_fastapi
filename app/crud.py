@@ -16,6 +16,10 @@ class FollowExists(Exception):
     pass
 
 
+class GroupDoesNotExist(Exception):
+    pass
+
+
 def get_user(db: Session, *, username: str) -> User | None:
     return db.scalar(select(User).where(User.username == username))
 
@@ -54,21 +58,38 @@ def get_post(db: Session, *, post_id: int) -> Post | None:
 
 
 def create_post(
-    db: Session,
-    *,
-    text: str,
-    image: str | None,
-    author_id: int,
-    group_id: int | None
+    db: Session, *, data: schemas.PostCreate, author_id: int
 ) -> Post:
+    if data.group and not get_group(db, group_id=data.group):
+        raise GroupDoesNotExist
     db_post = Post(
-        text=text, image=image, author_id=author_id, group_id=group_id
+        **data.model_dump(exclude={'group'}),
+        group_id=data.group,
+        author_id=author_id,
     )
 
     db.add(db_post)
     db.commit()
     db.refresh(db_post)
     return db_post
+
+
+def update_post(
+    db: Session, *, post: Post, data: schemas.PostUpdate
+) -> Post | None:
+    if data.group and not get_group(db, group_id=data.group):
+        raise GroupDoesNotExist
+
+    update_data = data.model_dump(exclude_unset=True)
+    if 'group' in update_data:
+        update_data['group_id'] = update_data.pop('group')
+    for field, value in update_data.items():
+        setattr(post, field, value)
+
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    return post
 
 
 def delete_post(db: Session, *, post: Post) -> None:
