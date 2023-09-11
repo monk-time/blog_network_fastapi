@@ -75,7 +75,7 @@ def create_post(
 
 
 def update_post(
-    db: Session, *, post: Post, data: schemas.PostUpdate
+    db: Session, *, post: Post, data: schemas.PostUpdate | schemas.PostCreate
 ) -> Post | None:
     if data.group and not get_group(db, group_id=data.group):
         raise GroupDoesNotExist

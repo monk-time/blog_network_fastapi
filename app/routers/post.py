@@ -45,8 +45,25 @@ async def create_post(
 
 
 @router.patch('/{post_id}', response_model=schemas.Post)
-async def update_post(
+async def partial_update_post(
     data: schemas.PostUpdate,
+    post: Annotated[models.Post, Depends(get_post)],
+    current_user: Annotated[
+        schemas.UserInDB, Depends(get_current_active_user)
+    ],
+    db: Session = Depends(get_db),
+):
+    if current_user != post.author:
+        raise not_author_error('Изменение чужого контента запрещено.')
+    try:
+        return crud.update_post(db, post=post, data=data)
+    except crud.GroupDoesNotExist:
+        raise not_found_error('Страница не найдена.')
+
+
+@router.put('/{post_id}', response_model=schemas.Post)
+async def update_post(
+    data: schemas.PostCreate,
     post: Annotated[models.Post, Depends(get_post)],
     current_user: Annotated[
         schemas.UserInDB, Depends(get_current_active_user)
