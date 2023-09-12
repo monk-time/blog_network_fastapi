@@ -1,6 +1,9 @@
 from datetime import datetime
 
-from pydantic import AliasPath, BaseModel, EmailStr, Field, validator
+from pydantic import AliasPath, BaseModel, EmailStr, Field, field_validator
+
+from app.config import MEDIA_URL
+from app.utils import save_image
 
 
 class ErrorMessage(BaseModel):
@@ -62,12 +65,26 @@ class PostCreate(BaseModel):
     image: str | None = None
     group: int | None = None
 
+    @field_validator('image')
+    @classmethod
+    def save_image(cls, value: str | None) -> str | None:
+        if not value:
+            return value
+        if not value.startswith('data:image'):
+            raise ValueError('Картинка должна начинаться с `data:image`.')
+        try:
+            filename = save_image(value)
+        except Exception:
+            raise ValueError('Ошибка при сохранении файла.')
+        return filename
+
 
 class PostUpdate(PostCreate):
     text: str | None = None
 
-    @validator('text')
-    def text_cannot_be_null(cls, value):
+    @field_validator('text')
+    @classmethod
+    def text_cannot_be_null(cls, value: str | None) -> str:
         if value is None:
             raise ValueError('Поле text не может быть пустым.')
         return value
@@ -82,6 +99,11 @@ class Post(BaseModel):
     group: int | None = Field(
         default=None, validation_alias=AliasPath('group', 'id')
     )
+
+    @field_validator('image')
+    @classmethod
+    def relative_url(cls, value: str | None) -> str | None:
+        return MEDIA_URL + value if value else value
 
 
 class CommentCreate(BaseModel):

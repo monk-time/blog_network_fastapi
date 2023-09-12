@@ -17,4 +17,4 @@ for router in (auth, comment, follow, group, post, user):
 
 
 # TODO: correct documentation response for 401 (like in user.py) and 422/400
-# TODO: images
+# TODO: tests

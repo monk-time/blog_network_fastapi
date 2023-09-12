@@ -1,6 +1,11 @@
+from base64 import b64decode
+from uuid import uuid4
+
 from fastapi import HTTPException, Query, status
 from fastapi_pagination.links import LimitOffsetPage
 from passlib.context import CryptContext
+
+from app.config import MEDIA_ROOT
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -30,3 +35,14 @@ def not_author_error(message):
 Page = LimitOffsetPage.with_custom_options(
     limit=Query(10, ge=1, le=500),
 )
+
+
+def save_image(base64_encoded: str) -> str:
+    img_format, img_str = base64_encoded.split(';base64,')
+    ext = img_format.split('/')[-1]
+    filename = f'{uuid4()}.{ext}'
+    img_bytes = b64decode(img_str)
+    MEDIA_ROOT.mkdir(exist_ok=True)
+    with open(MEDIA_ROOT / filename, 'wb') as f:
+        f.write(img_bytes)
+    return filename
