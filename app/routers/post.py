@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.database import get_db
 from app.oauth2 import get_current_active_user
-from app.utils import not_author_error, not_found_error
+from app.utils import Page, not_author_error, not_found_error
 
 router = APIRouter(tags=['Post'], prefix='/posts')
 
@@ -18,7 +18,7 @@ async def get_post(post_id: int, db: Session = Depends(get_db)):
     return post
 
 
-@router.get('/', response_model=list[schemas.Post])
+@router.get('/', response_model=Page[schemas.Post])  # type: ignore
 async def read_posts(
     db: Session = Depends(get_db),
 ):

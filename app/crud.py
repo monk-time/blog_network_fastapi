@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -50,7 +51,7 @@ def get_group(db: Session, *, group_id: int) -> Group | None:
 
 
 def get_posts(db: Session) -> Sequence[Post]:
-    return db.scalars(select(Post)).all()
+    return paginate(db, select(Post))
 
 
 def get_post(db: Session, *, post_id: int) -> Post | None:
